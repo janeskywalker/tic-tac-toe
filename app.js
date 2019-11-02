@@ -3,6 +3,7 @@ console.log('tic-tac-toe time!')
 class Game {
     constructor() {
         this.turn = 'playerOne'
+        // make a gameboard
         this.gameBoard = new GameBoard()
     }
 
@@ -10,11 +11,17 @@ class Game {
         // reset 
     }
     
-    playTurn(x, y) {
-        // play a turn 
-        this.gameBoard.playSpot(x, y)
-        // switchTurn
-        this.gameBoard.switchTurn()
+    playTurn(r, c) {
+        // play a turn, depending on whose turn
+        if(this.turn === 'playerOne') {
+            this.gameBoard.playSpot(r, c, 1)
+        }
+        else {
+            this.gameBoard.playSpot(r, c, -1)
+        }
+
+        // switch Turn
+        this.switchTurn()
     }
 
     switchTurn() {
@@ -23,7 +30,6 @@ class Game {
         } else {
             this.turn = "playerOne"
         }
-        
     }
 }
 
@@ -41,18 +47,19 @@ class GameBoard {
 
     // }
 
-    isSpotValid(x, y) {
+    isSpotValid(r, c) {
         console.log('checking if spot valid')
 
         // check if spot valid
-        return this.gameBoard[x][y] === 0
+        return this.gameBoard[r][c] === 0
     }
 
-    playSpot(x, y) {
+    playSpot(r, c, z) {
         // check if spot is valid
         console.log('playing spot')
-        if(this.isSpotValid(x, y)){
-            this.gameBoard[x][y] =1
+        if(this.isSpotValid(r, c, z)){
+            // play the spot
+            this.gameBoard[r][c] = z
         }
         console.log(this.gameBoard)
     }
@@ -66,3 +73,6 @@ console.log(game)
 console.log(game.gameBoard)
 
 game.playTurn(0, 1)
+game.playTurn(0, 2)
+game.playTurn(1, 1)
+game.playTurn(1, 2)
