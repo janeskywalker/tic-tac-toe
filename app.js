@@ -2,7 +2,7 @@ console.log('tic-tac-toe time!')
 
 class Game {
     constructor() {
-        this.turn = null
+        this.turn = 'playerOne'
         this.gameBoard = new GameBoard()
     }
 
@@ -11,11 +11,19 @@ class Game {
     }
     
     playTurn(x, y) {
+        // play a turn 
         this.gameBoard.playSpot(x, y)
+        // switchTurn
+        this.gameBoard.switchTurn()
     }
 
     switchTurn() {
-
+        if(this.turn === "playerOne") {
+            this.turn = "playerTwo"
+        } else {
+            this.turn = "playerOne"
+        }
+        
     }
 }
 
