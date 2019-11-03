@@ -1,5 +1,13 @@
 console.log('tic-tac-toe time!')
 
+const GameState = {
+    PLAYER_ONE_WIN: 1,
+    PLAYER_TWO_WIN: 2,
+    TIE: 3,
+    INVALID_MOVE: 4,
+    CONTINUE: 5,
+};
+
 class Game {
     constructor() {
         this.turn = 'playerOne'
@@ -22,7 +30,16 @@ class Game {
             this.gameBoard.playSpot(r, c, -1)
         }
 
-        // switch Turn
+        // const state = this.gameBoard.getState()
+
+        // switch (state) {
+        //     case GameState.PLAYER_ONE_WIN:
+                
+        // }
+
+        // state of the game? // game has to know: playOne win, playerTwo win, tie, invalid play, board full
+
+        // switch Turn when board is no winner or board not full // depends on state of the game 
         this.switchTurn()
     }
 
@@ -33,6 +50,7 @@ class Game {
             this.turn = "playerOne"
         }
     }
+
 }
 
 
@@ -58,7 +76,7 @@ class GameBoard {
     }
 
     playSpot(r, c, z) {
-        // check if spot is valid
+        // check if spot is valid, not taken
         console.log('playing spot')
         if(this.isSpotValid(r, c)){
             // play the spot
@@ -73,53 +91,100 @@ class GameBoard {
         this.determinWinner()
     }
 
-    determinWinner() {
-        // vertical wins
-        if(this.gameBoard[0][0] + this.gameBoard[0][1] + this.gameBoard[0][2] === 3) {
-            this.winner = "playerOne won"
-        } else if(this.gameBoard[0][0] + this.gameBoard[0][1] + this.gameBoard[0][2] === -3) {
-            this.winner = "playerTwo won"
+
+    // check vertial wins
+    _checkColumnWin() {
+        let sum = 0
+        const numColumns = this.gameBoard[0].length
+
+        for (let i = 0; i < numColumns; i++) {
+            for(const row of this.gameBoard) {
+                sum = sum + row[i]
+            }
+            if(sum === 3) {
+                return "playerOne won"
+            } else if(sum === -3) {
+                return "playerTwo won"
+            } else {
+                sum = 0
+            }
         }
-        else if(this.gameBoard[1][0] + this.gameBoard[1][1] + this.gameBoard[1][2] === 3) {
-            this.winner = "playerOne won"
-        } else if(this.gameBoard[1][0] + this.gameBoard[1][1] + this.gameBoard[1][2] === -3) {
-            this.winner = "playerTwo won"
-        } else if(this.gameBoard[2][0] + this.gameBoard[2][1] + this.gameBoard[2][2] === 3) {
-            this.winner = "playerOne won"
-        } else if(this.gameBoard[2][0] + this.gameBoard[2][1] + this.gameBoard[2][2] === -3) {
-            this.winner = "playerTwo won"
+    }
+
+    // check horizontal wins
+    _checkRowWin() {
+        let sum = 0
+        for(const row of this.gameBoard) {
+            sum = row.reduce((acc, cur) => acc + cur, sum)
+
+            if(sum === 3) {
+                return "playerOne won"
+            } else if(sum === -3) {
+                return "playerTwo won"
+            } else {
+                sum = 0
+            }
         } 
+    }
+
+    // diagonal win
+    _checkDiagonalWin(){
         
-        // horizontal wins
-        else if(this.gameBoard[0][0] + this.gameBoard[1][0] + this.gameBoard[2][0] === 3) {
-            this.winner = "playerOne won"
-        } else if(this.gameBoard[0][0] + this.gameBoard[1][0] + this.gameBoard[2][0] === -3) {
-            this.winner = "playerTwo won"
-        } else if(this.gameBoard[0][1] + this.gameBoard[1][1] + this.gameBoard[2][1] === 3) {
-            this.winner = "playerOne won"
-        } else if(this.gameBoard[0][1] + this.gameBoard[1][1] + this.gameBoard[2][1] === -3) {
-            this.winner = "playerTwo won"
-        } else if(this.gameBoard[0][2] + this.gameBoard[1][2] + this.gameBoard[2][2] === 3) {
-            this.winner = "playerOne won"
-        }else if(this.gameBoard[0][2] + this.gameBoard[1][2] + this.gameBoard[2][2] === -3) {
-            this.winner = "playerTwo won"
+        console.log('checking diaglonal win')
+
+        const numColumns = this.gameBoard[0].length
+        const numRows = this.gameBoard[0].length
+
+        // from top left
+        let sum = 0
+        for(let i=0; i<numColumns; i++){
+            sum = sum + this.gameBoard[i][i]
+            console.log({i}, {sum})
         }
 
-        //diagonal wins
-        else if(this.gameBoard[0][0] + this.gameBoard[1][1] + this.gameBoard[2][2] === 3) {
-            this.winner = "playerOne won"
-        } else if(this.gameBoard[0][0] + this.gameBoard[1][1] + this.gameBoard[2][2] === -3) {
-            this.winner = "playerTwo won"
-        } else if(this.gameBoard[0][2] + this.gameBoard[1][1] + this.gameBoard[2][0] === 3) {
-            this.winner = "playerOne won"
-        } else if(this.gameBoard[0][2] + this.gameBoard[1][1] + this.gameBoard[2][0] === -3) {
-            this.winner = "playerTwo won"
-        } else{
-            console.log('no winner, keep playing')
+        if(sum === 3) {
+            return "playerOne won"
+        } else if(sum === -3) {
+            return "playerTwo won"
+        } else {
+            sum = 0
+        }
+        console.log('checking diagonal win from top left sum:', sum)
+
+
+        //from botton left
+        for(let i=0; i<numColumns; i++){
+            sum = sum + this.gameBoard[numRows - 1 - i][i]
         }
 
-        console.log(this.winner)
-        // clear board and stop the play
+        if(sum === 3) {
+            return "playerOne won" // GameState.PLAYER_ONE_WIN
+        } else if(sum === -3) {
+            return "playerTwo won"
+        } else {
+            sum = 0
+        }
+
+    }
+
+    determinWinner() {
+        console.log('determing winner')
+        let winner = this._checkColumnWin()
+        if(winner === undefined) {
+            winner = this._checkRowWin()
+        } 
+        if(winner === undefined) {
+            winner = this._checkDiagonalWin()
+        }
+
+        if(winner === "playOne") {
+            return GameState.PLAYER_ONE_WIN
+        }
+
+        if(winner === "playTwo") {
+            return GameState.PLAYER_TWO_WIN
+        }
+
     }
 }
 
@@ -127,10 +192,19 @@ const game = new Game()
 // console.log(game)
 // console.log(game.gameBoard)
 
+
+// playerOne dia win from top left
 game.playTurn(0, 0)
 game.playTurn(0, 1)
 game.playTurn(1, 1)
 game.playTurn(0, 2)
 game.playTurn(2, 2)
 game.playTurn(2, 0)
-game.playTurn(0, 1)
+
+// playerTwo dia win from bottom left
+// game.playTurn(0, 0)
+// game.playTurn(1, 1)
+// game.playTurn(0, 1)
+// game.playTurn(0, 2)
+// game.playTurn(2, 2)
+// game.playTurn(2, 0)
