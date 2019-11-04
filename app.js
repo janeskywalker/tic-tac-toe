@@ -20,24 +20,36 @@ class Game {
     }
     
     playTurn(r, c) {
+        let gameState
         // play a turn, depending on whose turn
         if(this.turn === 'playerOne') {
             console.log('playerOne\'s turn')
-            this.gameBoard.playSpot(r, c, 1)
+            gameState = this.gameBoard.playSpot(r, c, 1)
         }
         else {
             console.log('playerTwo\'s turn')
-            this.gameBoard.playSpot(r, c, -1)
+            gameState = this.gameBoard.playSpot(r, c, -1)
+            console.log({gameState})
         }
 
-        // const state = this.gameBoard.getState()
+  
+        switch (gameState) {
+            case GameState.PLAYER_ONE_WIN:
+                console.log('Player I won')
+                break;
+            case GameState.PLAYER_TWO_WIN:
+                console.log('Player II won')
+                break;
+            case GameState.TIE:
+                console.log('It a tie')
+                break;
+            case GameState.INVALID_MOVE:
+                console.log('Invalid spot')
+                break;
+            case GameState.CONTINUE:
+                console.log('Continue')
 
-        // switch (state) {
-        //     case GameState.PLAYER_ONE_WIN:
-                
-        // }
-
-        // state of the game? // game has to know: playOne win, playerTwo win, tie, invalid play, board full
+        }
 
         // switch Turn when board is no winner or board not full // depends on state of the game 
         this.switchTurn()
@@ -70,25 +82,31 @@ class GameBoard {
 
     isSpotValid(r, c) {
         console.log('checking if spot valid')
-
         // check if spot valid
         return this.gameBoard[r][c] === 0
     }
 
+    // Returns new game state to Game
     playSpot(r, c, z) {
         // check if spot is valid, not taken
         console.log('playing spot')
         if(this.isSpotValid(r, c)){
             // play the spot
             this.gameBoard[r][c] = z
+            console.log(this.gameBoard)
+            // determin winner
+            const winner = this.determinWinner()
+            if (winner === undefined) {
+                return GameState.CONTINUE
+            } else {
+                console.log({winner})
+                return winner
+            }
         }
+        // not invalid move, spot taken
         else{
-            console.log('invalid spot')
+            return GameState.INVALID_MOVE
         }
-        console.log(this.gameBoard)
-        
-        // determin winner
-        this.determinWinner()
     }
 
 
@@ -177,11 +195,13 @@ class GameBoard {
             winner = this._checkDiagonalWin()
         }
 
-        if(winner === "playOne") {
+        console.log({winner})
+
+        if(winner === "playerOne won") {
             return GameState.PLAYER_ONE_WIN
         }
 
-        if(winner === "playTwo") {
+        if(winner === "playerTwo won") {
             return GameState.PLAYER_TWO_WIN
         }
 
@@ -194,17 +214,17 @@ const game = new Game()
 
 
 // playerOne dia win from top left
-game.playTurn(0, 0)
-game.playTurn(0, 1)
-game.playTurn(1, 1)
-game.playTurn(0, 2)
-game.playTurn(2, 2)
-game.playTurn(2, 0)
-
-// playerTwo dia win from bottom left
 // game.playTurn(0, 0)
-// game.playTurn(1, 1)
 // game.playTurn(0, 1)
+// game.playTurn(1, 1)
 // game.playTurn(0, 2)
 // game.playTurn(2, 2)
 // game.playTurn(2, 0)
+
+// playerTwo dia win from bottom left
+game.playTurn(0, 0)
+game.playTurn(1, 1)
+game.playTurn(0, 1)
+game.playTurn(0, 2)
+game.playTurn(2, 2)
+game.playTurn(2, 0)
